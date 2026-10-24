@@ -1,47 +1,45 @@
-# Buyback × Binance Agentic Wallet
+# Buyback for AI agents
 
-An agent skill for discovering and joining [buyback.cafe](https://buyback.cafe) pools on BNB Smart Chain with Binance Agentic Wallet. It reads public pool and chain data, then prepares transaction data for Binance's official wallet tool. It never holds wallet keys or sends transactions itself.
+One public entry point lets an agent discover [buyback.cafe](https://buyback.cafe) pools on Robinhood Chain and BNB Smart Chain. Pool lookup requires no wallet or installation.
 
-This adapter currently supports BNB Smart Chain (`chainId 56`) only. The Buyback product also runs on Robinhood Chain, but that network is not implemented here.
+## Start with one link
 
-## Install
+Give a web-enabled agent [SKILL.md](SKILL.md), or ask it directly:
 
-1. Install the [official Binance Agentic Wallet skill and `baw` CLI](https://github.com/binance/binance-skills-hub/tree/main/skills/binance-web3/binance-agentic-wallet) following Binance's instructions.
-2. Install this skill in an agent that supports the Skills format:
+> Read https://buyback.cafe/api/v1/overview and list the live BNB Smart Chain Buyback pools. Include each deposit-token contract address, payment asset, budget, deadline, and pool link. Do not initiate a transaction.
 
-   ```bash
-   npx skills add joshua2ai/buyback-agentic-wallet
-   ```
+The same request can target Robinhood Chain. `SKILL.md` defines the network identities, field meanings, freshness checks, and pool links. The website and agents read the same index; the index can lag the chain by a few blocks. A wallet is needed only when the user later chooses an onchain action.
 
-3. In this skill's directory, install its pinned dependency:
+Agents with Skills support can install the guide for reuse:
 
-   ```bash
-   npm ci --ignore-scripts
-   ```
+```bash
+npx skills add joshua2ai/buyback-agentic-wallet
+```
 
-4. Sign in to your Agentic Wallet using Binance's instructions. For external contract calls, enable Developer Mode in the Binance App. Use `baw wallet address --json` to find your BSC wallet address.
+Publishing a skill does not place Buyback in Binance AI's built-in tool list. The user can provide this link to an agent that can read public URLs; automatic discovery inside a particular app depends on that app.
 
-Installing a GitHub skill does not automatically add Buyback to Binance AI's built-in tools. Run it in an agent environment that supports installed skills.
+## Optional BSC transaction preparation
 
-## Read-only examples
+The `scripts/buyback.mjs` adapter is for BNB Smart Chain (`chainId 56`). It verifies a pool against the BSC Factory and prepares unsigned deposit or claim calls. It does not hold keys, sign, or broadcast. Robinhood Chain transaction preparation is outside this adapter.
+
+In this repository, install the pinned dependency:
+
+```bash
+npm ci --ignore-scripts
+```
+
+Read-only inspection and unsigned call examples:
 
 ```bash
 node scripts/buyback.mjs list
 node scripts/buyback.mjs inspect --pool 0xPOOL_ADDRESS --wallet 0xYOUR_BSC_WALLET
-```
-
-The list command uses Buyback's public index when available. Pool inspection verifies the pool against the BSC Factory registry and reads state onchain. The default RPC is BNB Chain's public endpoint; set `BUYBACK_BSC_RPC_URL` to a trusted BSC RPC if needed.
-
-## Prepare a transaction
-
-```bash
 node scripts/buyback.mjs deposit --pool 0xPOOL_ADDRESS --wallet 0xYOUR_BSC_WALLET --amount 100
 node scripts/buyback.mjs claim --pool 0xPOOL_ADDRESS --wallet 0xYOUR_BSC_WALLET
 ```
 
-These commands output transaction calls; they do **not** sign or broadcast. For each call, use the official `baw contract-call preview` flow, review the target, value, token and risk result, and execute only after the wallet owner explicitly confirms. When ERC-20 approval is needed, this adapter requests the exact deposit amount. A claim can pay out the payment asset or, for a funder, the purchased-token allocation; see [SKILL.md](SKILL.md) for the full workflow.
+The script uses Buyback's public index when available and a BSC RPC for onchain verification. Set `BUYBACK_BSC_RPC_URL` to a reachable trusted BSC RPC when the default endpoint is unavailable. Its output is transaction data only. For Binance Agentic Wallet, install [Binance's official skill and `baw` CLI](https://github.com/binance/binance-skills-hub/tree/main/skills/binance-web3/binance-agentic-wallet), sign in through Binance's flow, and enable Developer Mode in the Binance App for external contract calls. Preview each call with `baw contract-call preview`; execute only after the wallet owner explicitly confirms it. The BSC Factory is [`0x8ed655c529004E7db3F46304140e5880aC09991B`](https://bscscan.com/address/0x8ed655c529004E7db3F46304140e5880aC09991B).
 
-The BSC Factory is [`0x8ed655c529004E7db3F46304140e5880aC09991B`](https://bscscan.com/address/0x8ed655c529004E7db3F46304140e5880aC09991B). Always verify the project token address, pool address and transaction preview. Pools and tokens can carry financial risk. The upgradeable contracts have not been independently audited; start with a small amount.
+Before any deposit, verify the project-token contract address, pool address, amount, and wallet preview. Tokens and pools carry financial risk. The upgradeable contracts have not been independently audited; start with a small amount.
 
 ## Development
 
@@ -50,4 +48,5 @@ npm ci --ignore-scripts
 npm test
 ```
 
-The adapter is maintained in the Buyback product source and published here as a standalone skill. See the [developer docs](https://buyback.cafe/docs) for contract rules and other integration paths.
+This skill is maintained in the [Buyback product source](https://buyback.cafe/docs) and published here as its public agent entry point.
+
