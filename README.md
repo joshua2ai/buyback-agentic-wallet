@@ -16,7 +16,7 @@ Agents with Skills support can install the guide for reuse:
 npx skills add joshua2ai/buyback-agentic-wallet
 ```
 
-Publishing a skill does not place Buyback in Binance AI's built-in tool list. The user can provide this link to an agent that can read public URLs; automatic discovery inside a particular app depends on that app.
+Publishing a skill does not automatically add Buyback to an agent app's built-in tools. Give the public link to any agent that can read URLs; automatic discovery depends on the app.
 
 ## Optional BSC transaction preparation
 
