@@ -1,0 +1,11 @@
+{
+  "name": "buyback-bsc-agentic-wallet",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test scripts/buyback.test.mjs"
+  },
+  "dependencies": {
+    "ethers": "6.17.0"
+  }
+}
